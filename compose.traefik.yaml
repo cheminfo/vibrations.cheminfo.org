@@ -1,0 +1,55 @@
+# Traefik deployment — no port published on the host.
+#
+# Requires an external Docker network named `traefik` hosting the reverse
+# proxy, with a `websecure` entrypoint and a `letsencrypt` cert resolver.
+#
+# Select with COMPOSE_FILE=compose.traefik.yaml in .env, then:
+#   docker compose up -d
+
+services:
+  vibrations:
+    # Use the released image by default. To build locally instead, run:
+    #   docker compose up -d --build
+    image: ${IMAGE_NAME:-ghcr.io/cheminfo/vibrations.cheminfo.org}:${IMAGE_TAG:-latest}
+    build: .
+    # What the server's deploy script probes before it keeps a new container.
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:80/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 256
+    ulimits:
+      core: 0
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    # Only the proxy's network: nothing here talks to a sibling container, and
+    # naming `default` as well would have compose cut a second subnet out of a
+    # pool that runs out after a few dozen stacks on one host.
+    networks:
+      - traefik
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
+      - 'traefik.http.routers.vibrations.rule=Host(`vibrations.cheminfo.org`)'
+      - 'traefik.http.routers.vibrations.entrypoints=websecure'
+      - 'traefik.http.routers.vibrations.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.vibrations.loadbalancer.server.port=80'
+
+networks:
+  traefik:
+    external: true

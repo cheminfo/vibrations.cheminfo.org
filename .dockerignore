@@ -1,0 +1,20 @@
+compose*.yaml
+.env
+node_modules
+dist
+coverage
+.git
+.claude
+report
+research
+upstream
+# The Validation page bundles experiments/reference/fixtures via import.meta.glob,
+# so those 196 kB must reach the build. Everything else under experiments/ is
+# provenance for how they were produced and is not shipped.
+experiments/benchmark
+experiments/fortran-wasm
+experiments/m1-flang-wasm-probes
+experiments/reference/geometries
+experiments/reference/logs
+experiments/reference/scripts
+experiments/reference/testsuite
