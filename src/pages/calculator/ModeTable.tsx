@@ -201,13 +201,13 @@ const rowStyle = {
 } as const;
 
 const selectedRowStyle = {
-  background: 'rgb(45 114 210 / 12%)',
-  borderColor: 'rgb(45 114 210 / 45%)',
+  background: 'color-mix(in oklab, var(--accent) 12%, transparent)',
+  borderColor: 'color-mix(in oklab, var(--accent) 45%, transparent)',
 } as const;
 
 const hoveredRowStyle = {
-  background: 'rgb(45 114 210 / 6%)',
-  borderColor: 'rgb(45 114 210 / 25%)',
+  background: 'color-mix(in oklab, var(--accent) 6%, transparent)',
+  borderColor: 'color-mix(in oklab, var(--accent) 25%, transparent)',
 } as const;
 
 const indexCellStyle = {

@@ -129,8 +129,8 @@ const rowStyle = {
 
 const selectedRowStyle = {
   ...rowStyle,
-  borderLeft: '3px solid rgb(45 114 210)',
-  background: 'rgb(237 242 250)',
+  borderLeft: '3px solid var(--accent)',
+  background: 'color-mix(in oklab, var(--accent) 8%, var(--surface))',
 } as const;
 
 const hintStyle = { padding: '8px 10px', fontSize: 11 } as const;

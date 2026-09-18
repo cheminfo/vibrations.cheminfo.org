@@ -41,7 +41,7 @@ export function intensityFill(
   const intensity = modeIntensity(row.mode, chart);
   if (maximum <= 0 || intensity === null || intensity <= 0) return undefined;
   const percent = Math.min(100, (intensity / maximum) * 100);
-  return `linear-gradient(to left, rgb(45 114 210 / 18%) ${percent}%, transparent ${percent}%)`;
+  return `linear-gradient(to left, color-mix(in oklab, var(--accent) 18%, transparent) ${percent}%, transparent ${percent}%)`;
 }
 
 function strongestIn(

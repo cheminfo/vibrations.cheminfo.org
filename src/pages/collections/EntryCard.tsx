@@ -140,7 +140,7 @@ const cardStyle = {
 
 const runningCardStyle = {
   ...cardStyle,
-  border: '1px solid rgb(45 114 210)',
+  border: '1px solid var(--accent)',
 } as const;
 
 const depictionStyle = {

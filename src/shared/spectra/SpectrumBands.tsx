@@ -87,4 +87,4 @@ const BAR_HEIGHT = 7;
 
 const IDLE = '#d9a441';
 const HOVERED = '#c87619';
-const SELECTED = '#2d72d2';
+const SELECTED = 'var(--accent)';

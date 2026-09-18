@@ -3,13 +3,14 @@ import type { IconName } from '@blueprintjs/icons';
 import { useSignals } from '@preact/signals-react/runtime';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import type { NavItem } from 'react-cheminfo/ui';
+import { NavLink, SiteHeader, SiteTheme } from 'react-cheminfo/ui';
 import {
   Accordion,
   AccordionProvider,
   ActivityBar,
   RootLayout,
   SplitPane,
-  Toolbar,
 } from 'react-science/ui';
 
 import { CalculatorPage } from './pages/calculator/CalculatorPage.tsx';
@@ -20,6 +21,7 @@ import { AppLogo } from './shared/AppLogo.tsx';
 import { PanelStack } from './shared/PanelStack.tsx';
 import { StatusBar } from './shared/StatusBar.tsx';
 import { panelsForPage } from './shared/panels.ts';
+import { SITE } from './site.ts';
 import type { PageId } from './state/index.ts';
 import { applyHash, setPage, state, togglePanel } from './state/index.ts';
 
@@ -49,8 +51,9 @@ const PAGE_VIEWS: Partial<Record<PageId, () => ReactNode>> = {
 };
 
 /**
- * The application shell: the page toolbar on the left, the active page in the
- * middle over the status bar, and the side panels on the right.
+ * The application shell: the site's bar with its pages and About on top, then
+ * the active page over the status bar, with the side panels on the right. The
+ * bar carries no Tools menu: the site is not one of the cheminfo family.
  */
 export function App() {
   useSignals();
@@ -65,77 +68,90 @@ export function App() {
     return () => globalThis.removeEventListener('hashchange', applyHash);
   }, []);
 
-  return (
-    <RootLayout style={{ height: '100%' }}>
-      <div style={rootStyle}>
-        <Toolbar vertical aria-label="Application">
-          <Toolbar.Item
-            icon={<AppLogo size={16} />}
-            tooltip="About Vibrations"
-            aria-label="About Vibrations"
-            onClick={() => (state.view.aboutOpen.value = true)}
-          />
-          {PAGE_ITEMS.map((item) => (
-            <Toolbar.Item
-              key={item.id}
-              icon={item.icon}
-              tooltip={item.title}
-              aria-label={item.title}
-              active={page === item.id}
-              onClick={() => setPage(item.id)}
-            />
-          ))}
-        </Toolbar>
+  const nav: NavItem[] = PAGE_ITEMS.map((item) => ({
+    id: item.id,
+    label: item.title,
+    href: `#/${item.id}`,
+    onSelect: () => setPage(item.id),
+  }));
 
-        <SplitPane
-          direction="horizontal"
-          controlledSide="end"
-          defaultSize="400px"
-          open={openHere.length > 0}
-          onOpenChange={(open) => {
-            if (open) {
-              const first = panels[0];
-              if (first !== undefined) togglePanel(first.id);
-            } else {
-              for (const panel of openHere) togglePanel(panel.id);
-            }
-          }}
-        >
-          <div style={mainStyle}>
-            <div style={viewStyle}>
-              <PageView page={page} />
-            </div>
-            <StatusBar />
+  return (
+    <div className="app">
+      <SiteTheme site={SITE} />
+      <SiteHeader
+        site={SITE}
+        mark={<AppLogo size={26} />}
+        width="full"
+        nav={nav}
+        activeId={page}
+        homeHref="#/calculator"
+        onHome={() => setPage('calculator')}
+        actions={
+          <NavLink
+            item={{
+              id: 'about',
+              label: 'About',
+              icon: <AppLogo size={14} />,
+              title: `What ${SITE.host} is, and what it is built on`,
+              onSelect: () => (state.view.aboutOpen.value = true),
+            }}
+          />
+        }
+      />
+      <main className="app-body">
+        <RootLayout style={{ height: '100%' }}>
+          <div style={rootStyle}>
+            <SplitPane
+              direction="horizontal"
+              controlledSide="end"
+              defaultSize="400px"
+              open={openHere.length > 0}
+              onOpenChange={(open) => {
+                if (open) {
+                  const first = panels[0];
+                  if (first !== undefined) togglePanel(first.id);
+                } else {
+                  for (const panel of openHere) togglePanel(panel.id);
+                }
+              }}
+            >
+              <div style={mainStyle}>
+                <div style={viewStyle}>
+                  <PageView page={page} />
+                </div>
+                <StatusBar />
+              </div>
+
+              <AccordionProvider>
+                <Accordion>
+                  <PanelStack />
+                </Accordion>
+              </AccordionProvider>
+            </SplitPane>
+
+            <ActivityBar>
+              {panels.map((panel) => (
+                <ActivityBar.Item
+                  key={panel.id}
+                  icon={panel.icon}
+                  tooltip={panel.title}
+                  // A tooltip is not an accessible name: without this the six panel
+                  // toggles are icon-only buttons with no text at all.
+                  aria-label={panel.title}
+                  active={openPanels.has(panel.id)}
+                  onClick={() => togglePanel(panel.id)}
+                />
+              ))}
+            </ActivityBar>
           </div>
 
-          <AccordionProvider>
-            <Accordion>
-              <PanelStack />
-            </Accordion>
-          </AccordionProvider>
-        </SplitPane>
-
-        <ActivityBar>
-          {panels.map((panel) => (
-            <ActivityBar.Item
-              key={panel.id}
-              icon={panel.icon}
-              tooltip={panel.title}
-              // A tooltip is not an accessible name: without this the six panel
-              // toggles are icon-only buttons with no text at all.
-              aria-label={panel.title}
-              active={openPanels.has(panel.id)}
-              onClick={() => togglePanel(panel.id)}
-            />
-          ))}
-        </ActivityBar>
-      </div>
-
-      <AboutDialog
-        isOpen={state.view.aboutOpen.value}
-        onClose={() => (state.view.aboutOpen.value = false)}
-      />
-    </RootLayout>
+          <AboutDialog
+            isOpen={state.view.aboutOpen.value}
+            onClose={() => (state.view.aboutOpen.value = false)}
+          />
+        </RootLayout>
+      </main>
+    </div>
   );
 }
 

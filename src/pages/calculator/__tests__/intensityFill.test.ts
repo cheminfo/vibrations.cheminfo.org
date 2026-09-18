@@ -23,10 +23,10 @@ test('the maxima are read per chart', () => {
 test('a bar is as wide as the band is strong, against its own chart', () => {
   const strongest = strongestIntensities(ROWS);
   expect(intensityFill(row(0), column('ir'), strongest)).toBe(
-    'linear-gradient(to left, rgb(45 114 210 / 18%) 5%, transparent 5%)',
+    'linear-gradient(to left, color-mix(in oklab, var(--accent) 18%, transparent) 5%, transparent 5%)',
   );
   expect(intensityFill(row(1), column('raman'), strongest)).toBe(
-    'linear-gradient(to left, rgb(45 114 210 / 18%) 50%, transparent 50%)',
+    'linear-gradient(to left, color-mix(in oklab, var(--accent) 18%, transparent) 50%, transparent 50%)',
   );
 });
 

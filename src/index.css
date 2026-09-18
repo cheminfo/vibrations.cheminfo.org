@@ -1,3 +1,6 @@
+/* The neutrals, the geometry, the type and the bar of the cheminfo sites. */
+@import 'react-cheminfo/styles/chrome.css';
+
 *,
 *::before,
 *::after {
@@ -21,8 +24,19 @@ body,
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* A workbench: the bar and the tool fill the window, and nothing scrolls it. */
+.app {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+.app-body {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .help-label {

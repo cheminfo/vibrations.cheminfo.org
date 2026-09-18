@@ -160,8 +160,8 @@ const selectStyle = {
 } as const;
 
 const activeStyle = {
-  background: 'rgb(45 114 210 / 10%)',
-  borderColor: 'rgb(45 114 210 / 45%)',
+  background: 'color-mix(in oklab, var(--accent) 10%, transparent)',
+  borderColor: 'color-mix(in oklab, var(--accent) 45%, transparent)',
 } as const;
 
 const swatchStyle = {
