@@ -39,7 +39,7 @@
     "react-science": "^23.1.1",
     "spc-parser": "^2.1.1",
     "spectrum-generator": "^8.2.1",
-    "xtb-wasm": "file:../../xtb-wasm"
+    "xtb-wasm": "^1.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

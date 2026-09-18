@@ -12,19 +12,12 @@ const DEV_PORT = 10_919;
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    // xtb-wasm is linked from a sibling checkout, so Vite resolves it by its
-    // real path and would load openchemlib from *its* node_modules as well as
-    // this one. Two copies mean two Molecule classes, and the atom indices the
-    // bond-to-mode highlighting depends on stop being comparable across the
-    // boundary.
+    // A linked xtb-wasm carries its own node_modules; two openchemlib copies
+    // mean two Molecule classes, and the atom indices the bond-to-mode
+    // highlighting depends on stop being comparable across the boundary.
     dedupe: ['openchemlib'],
   },
   server: {
-    fs: {
-      // The linked package lives outside this project, and its files are
-      // served by real path.
-      allow: ['..', '../../xtb-wasm'],
-    },
     port: DEV_PORT,
     strictPort: true,
   },
