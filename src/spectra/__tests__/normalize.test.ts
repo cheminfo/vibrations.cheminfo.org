@@ -29,9 +29,14 @@ test('an absorbance trace is scaled so its strongest band reads 50 % transmittan
       0.150_514_997_831_990_6,
     ]),
   );
-  expect(variables?.t?.data).toStrictEqual(
-    new Float64Array([84.089_641_525_371_45, 50, 70.710_678_118_654_76]),
-  );
+  // T = 100 · 10^(−A) is left to the engine's pow, which Node 22 rounds one ulp
+  // away from Node 24, so it is compared to 12 digits rather than bit for bit.
+  expect(variables?.t?.data).toBeInstanceOf(Float64Array);
+  expect(Array.from(variables?.t?.data ?? [])).toStrictEqual([
+    expect.closeTo(84.089_641_525_371_45, 12),
+    expect.closeTo(50, 12),
+    expect.closeTo(70.710_678_118_654_76, 12),
+  ]);
 });
 
 test('the window decides which band is driven to 50 % transmittance', () => {
@@ -111,9 +116,11 @@ test('a transmittance-only source gets its absorbance recomputed from the scaled
   );
   expect(variables?.t?.label).toBe('Transmittance');
   expect(variables?.t?.units).toBe('%');
-  expect(variables?.t?.data).toStrictEqual(
-    new Float64Array([84.089_641_525_371_45, 50]),
-  );
+  expect(variables?.t?.data).toBeInstanceOf(Float64Array);
+  expect(Array.from(variables?.t?.data ?? [])).toStrictEqual([
+    expect.closeTo(84.089_641_525_371_45, 12),
+    expect.closeTo(50, 12),
+  ]);
 });
 
 function absorbanceTrace(): SpectrumTrace {
