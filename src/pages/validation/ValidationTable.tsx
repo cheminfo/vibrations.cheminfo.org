@@ -1,5 +1,6 @@
 import { Button, Classes, HTMLTable, Tag } from '@blueprintjs/core';
 import { useEffect, useLayoutEffect, useRef } from 'react';
+import { ClickToCopy } from 'react-cheminfo/ui';
 
 import type { ValidationRow } from '../../state/index.ts';
 
@@ -120,11 +121,14 @@ export function ValidationTable(props: ValidationTableProps) {
                   {row.status}
                 </Tag>
                 {row.message !== null && (
-                  <div
+                  <ClickToCopy
+                    as="div"
+                    value={row.message}
+                    label="message"
                     className={`${Classes.TEXT_SMALL} ${Classes.TEXT_MUTED}`}
                   >
                     {row.message}
-                  </div>
+                  </ClickToCopy>
                 )}
               </td>
               <td>

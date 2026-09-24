@@ -15,6 +15,10 @@ interface CollectionHeaderProps {
 
 /**
  * What a collection is, what it costs to run, and what it is meant to teach.
+ *
+ * The teaching paragraphs are the site's own prose and a student quotes them,
+ * so they carry `text-selectable`; the title row, the tags and the estimate
+ * callout are chrome and stay unselectable.
  * @param props - Component props.
  * @param props.collection - The open collection.
  * @returns The header block.
@@ -59,13 +63,16 @@ export function CollectionHeader(props: CollectionHeaderProps) {
       </Callout>
 
       {paragraphs(explanation).map((paragraph) => (
-        <p key={paragraph} style={paragraphStyle}>
+        <p key={paragraph} className="text-selectable" style={paragraphStyle}>
           {paragraph}
         </p>
       ))}
 
       {theory !== undefined && (
-        <p className={Classes.TEXT_MUTED} style={paragraphStyle}>
+        <p
+          className={`${Classes.TEXT_MUTED} text-selectable`}
+          style={paragraphStyle}
+        >
           {theory}
         </p>
       )}

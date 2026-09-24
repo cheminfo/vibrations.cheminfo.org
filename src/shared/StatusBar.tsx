@@ -1,5 +1,6 @@
 import { Classes, ProgressBar, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { ClickToCopy } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 import { occPoolWorkerCount } from 'xtb-wasm';
 
@@ -26,7 +27,9 @@ export function StatusBar() {
         <span className={Classes.TEXT_MUTED}>No molecule loaded</span>
       ) : (
         <>
-          <MF mf={molecule.formula} />
+          <ClickToCopy value={molecule.formula} label="molecular formula">
+            <MF mf={molecule.formula} />
+          </ClickToCopy>
           <Separator />
           <span>{molecule.elements.length} atoms</span>
         </>
@@ -37,7 +40,12 @@ export function StatusBar() {
           <Separator />
           <span>{result.modes.length} modes</span>
           <Separator />
-          <span>{result.energy.total.toFixed(8)} Eh</span>
+          <ClickToCopy
+            value={result.energy.total.toFixed(8)}
+            label="total energy in Eh"
+          >
+            {result.energy.total.toFixed(8)} Eh
+          </ClickToCopy>
           <Separator />
           <span>{(result.timings.total / 1000).toFixed(2)} s</span>
           {result.imaginaryCount > 0 && (

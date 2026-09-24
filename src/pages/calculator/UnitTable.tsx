@@ -1,4 +1,5 @@
 import { Tooltip } from '@blueprintjs/core';
+import { ClickToCopy } from 'react-cheminfo/ui';
 
 /** One row: a named quantity, already formatted once per unit column. */
 export interface UnitTableRow {
@@ -43,17 +44,30 @@ export function UnitTable(props: {
                 <span>{row.label}</span>
               </Tooltip>
             </td>
-            {props.units.map((unit, index) => (
-              <td key={unit} style={numberCellStyle}>
-                {row.values[index] ?? ''}
-              </td>
-            ))}
+            {props.units.map((unit, index) => {
+              const value = row.values[index] ?? '';
+              return (
+                <ClickToCopy
+                  key={unit}
+                  as="td"
+                  value={value}
+                  label={`${row.label} in ${unit}`}
+                  disabled={value === ''}
+                  style={numberCellStyle}
+                >
+                  {value}
+                </ClickToCopy>
+              );
+            })}
           </tr>
         ))}
       </tbody>
     </table>
   );
 }
+
+/** Room the copy glyph needs inside the right edge of a cell, in pixels. */
+const GLYPH_ROOM = 22;
 
 const tableStyle = {
   width: '100%',
@@ -68,12 +82,20 @@ const headStyle = {
   padding: '2px 4px',
 } as const;
 
-const numberHeadStyle = { ...headStyle, textAlign: 'right' } as const;
+const numberHeadStyle = {
+  ...headStyle,
+  textAlign: 'right',
+  paddingRight: GLYPH_ROOM,
+} as const;
 
 const labelCellStyle = { padding: '2px 4px' } as const;
 
+/* The inline padding of a number cell beats the library's block padding, so
+   the room the copy glyph needs is kept here, on the cells and their heads
+   alike, and the column stays aligned when a cell has nothing to copy. */
 const numberCellStyle = {
   padding: '2px 4px',
+  paddingRight: GLYPH_ROOM,
   textAlign: 'right',
   fontVariantNumeric: 'tabular-nums',
   whiteSpace: 'nowrap',

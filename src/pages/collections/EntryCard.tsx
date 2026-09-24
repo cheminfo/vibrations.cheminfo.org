@@ -1,5 +1,6 @@
 import { Button, Classes, Tag, Tooltip } from '@blueprintjs/core';
 import { Structure } from 'react-cheminfo/structure';
+import { ClickToCopy } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 
 import type { CollectionEntry } from '../../data/index.ts';
@@ -8,7 +9,8 @@ import type { ResultEntry } from '../../state/index.ts';
 
 import { estimateSeconds, formatDuration } from './cost.ts';
 import type { EntryStatus } from './entryStatus.ts';
-import { CARBONYL_PROBE, strongestBand } from './keyBand.ts';
+import type { BandProbe } from './keyBand.ts';
+import { strongestBand } from './keyBand.ts';
 
 interface EntryCardProps {
   entry: CollectionEntry;
@@ -17,6 +19,11 @@ interface EntryCardProps {
   result: ResultEntry | null;
   /** Why this entry did not produce a result, when it failed. */
   failure: string | null;
+  /**
+   * The band this collection is read on, or `undefined` for a collection that
+   * probes no particular band and so shows none on its cards.
+   */
+  probe: BandProbe | undefined;
   onRun: () => void;
   onInspect: () => void;
   onToggleVisible: () => void;
@@ -30,33 +37,53 @@ interface EntryCardProps {
  * @param props.status - How far this entry has got.
  * @param props.result - Its stored calculation, or `null`.
  * @param props.failure - Its failure message, or `null`.
+ * @param props.probe - The collection's probe band, or `undefined`.
  * @param props.onRun - Compute this one molecule.
  * @param props.onInspect - Make it the active molecule.
  * @param props.onToggleVisible - Show or hide its spectrum.
  * @returns The card.
  */
 export function EntryCard(props: EntryCardProps) {
-  const { entry, status, result, failure, onRun, onInspect, onToggleVisible } =
-    props;
+  const {
+    entry,
+    status,
+    result,
+    failure,
+    probe,
+    onRun,
+    onInspect,
+    onToggleVisible,
+  } = props;
   const band =
-    result === null ? null : strongestBand(result.result.modes, CARBONYL_PROBE);
+    result === null || probe === undefined
+      ? null
+      : strongestBand(result.result.modes, probe);
 
   return (
     <div style={status === 'running' ? runningCardStyle : cardStyle}>
-      <div style={depictionStyle}>
+      <ClickToCopy
+        as="div"
+        value={entry.smiles}
+        label="SMILES"
+        style={depictionStyle}
+      >
         <Structure idCode={entry.idCode} width={150} height={100} />
-      </div>
+      </ClickToCopy>
 
       <div style={titleStyle}>
         {result !== null && (
           <span style={{ ...swatchStyle, background: result.color }} />
         )}
-        <span style={{ fontWeight: 600 }}>{entry.name}</span>
+        <ClickToCopy value={entry.name} label="name">
+          <span style={{ fontWeight: 600 }}>{entry.name}</span>
+        </ClickToCopy>
       </div>
 
       <div className={Classes.TEXT_MUTED} style={metaStyle}>
-        <MF mf={entry.formula} /> · {entry.atoms} atoms ·{' '}
-        {formatDuration(estimateSeconds(entry.atoms))}
+        <ClickToCopy value={entry.formula} label="molecular formula">
+          <MF mf={entry.formula} />
+        </ClickToCopy>{' '}
+        · {entry.atoms} atoms · {formatDuration(estimateSeconds(entry.atoms))}
       </div>
 
       <div style={tagRowStyle}>
@@ -84,10 +111,15 @@ export function EntryCard(props: EntryCardProps) {
             queued
           </Tag>
         )}
-        {band !== null && (
-          <Tag minimal intent="success">
-            {band.wavenumber.toFixed(0)} cm⁻¹
-          </Tag>
+        {band !== null && probe !== undefined && (
+          <ClickToCopy
+            value={band.wavenumber.toFixed(0)}
+            label={`${probe.label} wavenumber in cm⁻¹`}
+          >
+            <Tag minimal intent="success">
+              {band.wavenumber.toFixed(0)} cm⁻¹
+            </Tag>
+          </ClickToCopy>
         )}
         {failure !== null && (
           <Tooltip content={failure}>

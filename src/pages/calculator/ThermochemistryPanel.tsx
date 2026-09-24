@@ -1,5 +1,6 @@
 import { Callout, Classes, Tag, Tooltip } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { ClickToCopy } from 'react-cheminfo/ui';
 import { Toolbar } from 'react-science/ui';
 
 import {
@@ -70,9 +71,14 @@ export function ThermochemistryPanel() {
               <Tag minimal intent="primary">
                 {`${(thermochemistry.pressure / 1000).toFixed(3)} kPa`}
               </Tag>
-              <Tag minimal intent="success">
-                {`point group ${thermochemistry.pointGroup}`}
-              </Tag>
+              <ClickToCopy
+                value={thermochemistry.pointGroup}
+                label="point group"
+              >
+                <Tag minimal intent="success">
+                  {`point group ${thermochemistry.pointGroup}`}
+                </Tag>
+              </ClickToCopy>
               <Tooltip
                 content={
                   overridden === null

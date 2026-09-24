@@ -11,6 +11,8 @@ export interface ModeColumn {
   id: string;
   /** Column heading, short enough for a side panel. */
   label: string;
+  /** Column heading with its unit, for a table taken out of the page. */
+  heading: string;
   /** What the heading means, shown as its tooltip. */
   title: string;
   /** Column width in pixels. */
@@ -42,6 +44,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
     {
       id: 'wavenumber',
       label: 'ν̃',
+      heading: 'ν̃ (cm⁻¹)',
       title:
         'Harmonic wavenumber in cm⁻¹. A negative value is an imaginary mode.',
       width: 62,
@@ -55,6 +58,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
     columns.push({
       id: 'ir',
       label: 'IR',
+      heading: 'IR (km/mol)',
       title: 'Infrared intensity in km/mol, from the dipole derivatives.',
       width: 54,
       sortKey: 'intensity',
@@ -68,6 +72,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
       {
         id: 'raman',
         label: 'Raman',
+        heading: 'Raman (Å⁴/amu)',
         title:
           'Raman scattering activity in Å⁴/amu, from the bond-polarizability model.',
         width: 60,
@@ -78,6 +83,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
       {
         id: 'depolarization',
         label: 'ρ',
+        heading: 'ρ',
         title:
           'Depolarization ratio for natural incident light, between 0 and 0.75.',
         width: 44,
@@ -90,6 +96,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
     {
       id: 'reducedMass',
       label: 'μ',
+      heading: 'μ (amu)',
       title: 'Reduced mass of the mode, in amu.',
       width: 48,
       value: (mode) => mode.reducedMass.toFixed(2),
@@ -97,6 +104,7 @@ export function modeColumns(selection: ChartSelection): ModeColumn[] {
     {
       id: 'forceConstant',
       label: 'k',
+      heading: 'k (mDyn/Å)',
       title: 'Force constant of the mode, in mDyn/Å.',
       width: 48,
       value: (mode) => mode.forceConstant.toFixed(3),
@@ -120,11 +128,14 @@ export function columnsWidth(columns: readonly ModeColumn[]): number {
   return width;
 }
 
+/** What a cell shows when the engine produced no number for it. */
+export const MISSING_VALUE = '—';
+
 /** Width of the leading mode-number column, in pixels. */
 export const INDEX_WIDTH = 30;
 /** Horizontal gap between two columns, in pixels. */
 export const COLUMN_GAP = 6;
 
 function optional(value: number | null, digits: number): string {
-  return value === null ? '—' : value.toFixed(digits);
+  return value === null ? MISSING_VALUE : value.toFixed(digits);
 }

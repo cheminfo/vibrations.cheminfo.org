@@ -6,6 +6,7 @@ import { StructureEditor } from 'react-cheminfo/structure';
 
 import { state } from '../../state/index.ts';
 
+import { DRAWN_STRUCTURE_LABEL } from './drawnStructure.ts';
 import type { MoleculeLoader } from './useMoleculeLoader.ts';
 
 /** What the uncontrolled canvas was last loaded with. */
@@ -54,7 +55,7 @@ export function StructureDrawer(props: StructureDrawerProps): ReactElement {
     (change: StructureEditorChange) => {
       if (change.smiles.trim() === '') return;
       setSeed((current) => ({ ...current, drawn: change.molfile }));
-      loadMolfile(change.molfile, 'Drawn structure');
+      loadMolfile(change.molfile, DRAWN_STRUCTURE_LABEL);
     },
     [loadMolfile],
   );

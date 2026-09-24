@@ -2,12 +2,15 @@ import { Callout, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import type { CSSProperties, ReactElement } from 'react';
 import { useState } from 'react';
+import { ClickToCopy, useCopyToClipboard } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 import { Toolbar } from 'react-science/ui';
+import type { Molecule } from 'xtb-wasm';
 import { toXyz } from 'xtb-wasm';
 
 import { clearMolecule, state } from '../state/index.ts';
 
+import { copyIcon, copyTooltip } from './copyFeedback.ts';
 import {
   panelBodyStyle,
   panelStyle,
@@ -18,6 +21,7 @@ import { MoleculeCandidates } from './structure/MoleculeCandidates.tsx';
 import { MoleculeInput } from './structure/MoleculeInput.tsx';
 import { StructureDepiction } from './structure/StructureDepiction.tsx';
 import { StructureDrawer } from './structure/StructureDrawer.tsx';
+import { DRAWN_STRUCTURE_LABEL } from './structure/drawnStructure.ts';
 import { moleculeGuards } from './structure/electrons.ts';
 import { useMoleculeLoader } from './structure/useMoleculeLoader.ts';
 
@@ -29,6 +33,7 @@ import { useMoleculeLoader } from './structure/useMoleculeLoader.ts';
 export function MoleculePanel(): ReactElement {
   useSignals();
   const loader = useMoleculeLoader();
+  const xyz = useCopyToClipboard();
   const [drawing, setDrawing] = useState(false);
   const molecule = state.data.molecule.value;
   const loaderWarnings = state.data.moleculeWarnings.value;
@@ -46,15 +51,13 @@ export function MoleculePanel(): ReactElement {
             onClick={() => setDrawing(!drawing)}
           />
           <Toolbar.Item
-            icon="clipboard"
-            tooltip="Copy the current geometry as XYZ"
+            icon={copyIcon(xyz)}
+            tooltip={copyTooltip(xyz, 'Copy the current geometry as XYZ')}
             aria-label="Copy XYZ"
             disabled={molecule === null}
             onClick={() => {
               if (molecule !== null) {
-                void navigator.clipboard.writeText(
-                  toXyz(molecule, molecule.label),
-                );
+                void xyz.copy(toXyz(molecule, molecule.label));
               }
             }}
           />
@@ -74,8 +77,16 @@ export function MoleculePanel(): ReactElement {
       <div style={panelBodyStyle}>
         {molecule !== null && (
           <div style={identityStyle}>
-            <b>{molecule.label}</b>
-            <MF mf={molecule.formula} />
+            <ClickToCopy
+              value={molecule.label}
+              label={labelNoun(molecule)}
+              disabled={molecule.label === DRAWN_STRUCTURE_LABEL}
+            >
+              <b>{molecule.label}</b>
+            </ClickToCopy>
+            <ClickToCopy value={molecule.formula} label="molecular formula">
+              <MF mf={molecule.formula} />
+            </ClickToCopy>
             <Tag minimal>{`${molecule.elements.length} atoms`}</Tag>
           </div>
         )}
@@ -117,6 +128,14 @@ export function MoleculePanel(): ReactElement {
       </div>
     </div>
   );
+}
+
+/** What the label of a molecule is, when it is worth taking away. */
+function labelNoun(molecule: Molecule): string {
+  const { source, label } = molecule;
+  return source.kind === 'smiles' && label === source.smiles
+    ? 'SMILES'
+    : 'name';
 }
 
 const identityStyle = {

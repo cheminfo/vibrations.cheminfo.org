@@ -1,7 +1,9 @@
 import { useSignals } from '@preact/signals-react/runtime';
 import { useMemo, useState } from 'react';
+import { useCopyToClipboard } from 'react-cheminfo/ui';
 import { Toolbar } from 'react-science/ui';
 
+import { copyIcon, copyTooltip } from '../../shared/copyFeedback.ts';
 import {
   panelBodyStyle,
   panelStyle,
@@ -20,6 +22,7 @@ import { ModeTable } from './ModeTable.tsx';
 import { modeColumns } from './modeColumns.ts';
 import type { ModeSortKey } from './modeRows.ts';
 import { sortedModeRows } from './modeRows.ts';
+import { modeTableText } from './modeTableText.ts';
 
 /**
  * The normal-mode table of the active result.
@@ -34,6 +37,7 @@ export function ModesPanel() {
   const selection = preferences.display.charts.value;
   const selected = view.selectedMode.value;
   const animating = view.animating.value;
+  const table = useCopyToClipboard();
   const [sort, setSort] = useState<Sort>(DEFAULT_SORT);
 
   const columns = useMemo(() => modeColumns(selection), [selection]);
@@ -71,6 +75,16 @@ export function ModesPanel() {
                 descending: !previous.descending,
               }))
             }
+          />
+          <Toolbar.Item
+            icon={copyIcon(table)}
+            tooltip={copyTooltip(
+              table,
+              'Copy the mode table as tab-separated text',
+            )}
+            aria-label="Copy the mode table"
+            disabled={rows.length === 0}
+            onClick={() => void table.copy(modeTableText(rows, columns))}
           />
           <Toolbar.Item
             icon="cross"

@@ -107,7 +107,8 @@ export function AboutDialog(props: AboutDialogProps) {
       icon={<AppLogo size={20} />}
       style={{ width: 720 }}
     >
-      <DialogBody>
+      {/* Prose, credits and literature references: a reader quotes them. */}
+      <DialogBody className="text-selectable">
         <Tabs id="about" defaultSelectedTabId="about" renderActiveTabPanelOnly>
           <Tab id="about" title="About" panel={<AboutPanel />} />
           <Tab id="credits" title="Credits" panel={<CreditsPanel />} />

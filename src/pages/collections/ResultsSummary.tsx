@@ -1,4 +1,6 @@
 import { Callout, Classes } from '@blueprintjs/core';
+import type { ReactNode } from 'react';
+import { ClickToCopy } from 'react-cheminfo/ui';
 
 import type { CollectionEntry, MoleculeCollection } from '../../data/index.ts';
 import type { ResultEntry } from '../../state/index.ts';
@@ -71,29 +73,84 @@ export function ResultsSummary(props: ResultsSummaryProps) {
             {probe === undefined ? (
               <>
                 <td>{row.bands}</td>
-                <td>{format(row.wavenumber)}</td>
+                <CopyCell
+                  value={fixed(row.wavenumber, 0)}
+                  label="strongest band in cm⁻¹"
+                >
+                  {format(row.wavenumber)}
+                </CopyCell>
               </>
             ) : (
               <>
-                <td>{format(row.wavenumber)}</td>
-                <td>
+                <CopyCell
+                  value={fixed(row.wavenumber, 0)}
+                  label={`${probe.label} in cm⁻¹`}
+                >
+                  {format(row.wavenumber)}
+                </CopyCell>
+                <CopyCell
+                  value={fixed(row.intensity, 1)}
+                  label="IR intensity in km/mol"
+                >
                   {row.intensity === null ? '—' : row.intensity.toFixed(1)}
-                </td>
-                <td>{signed(shift(row, first))}</td>
-                <td>
+                </CopyCell>
+                <CopyCell
+                  value={rounded(shift(row, first))}
+                  label={`shift vs. ${first.name} in cm⁻¹`}
+                >
+                  {signed(shift(row, first))}
+                </CopyCell>
+                <CopyCell
+                  value={
+                    row.experimental === undefined
+                      ? ''
+                      : String(row.experimental)
+                  }
+                  label="experimental wavenumber in cm⁻¹"
+                >
                   {row.experimental === undefined ? '—' : row.experimental}
-                </td>
-                <td
+                </CopyCell>
+                <CopyCell
+                  value={rounded(row.deviation)}
+                  label="computed − experiment in cm⁻¹"
                   className={row.deviation === null ? Classes.TEXT_MUTED : ''}
                 >
                   {signed(row.deviation)}
-                </td>
+                </CopyCell>
               </>
             )}
           </tr>
         ))}
       </tbody>
     </table>
+  );
+}
+
+/**
+ * A cell whose number a reader takes away, without the unit the cell shows.
+ * @param props - Component props.
+ * @param props.value - What goes on the clipboard, or `''` when the cell is a dash.
+ * @param props.label - What the value is, named in the hover title.
+ * @param props.className - Class the cell carries, in addition to its own.
+ * @param props.children - What the cell shows, unit and sign included.
+ * @returns The cell.
+ */
+function CopyCell(props: {
+  value: string;
+  label: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <ClickToCopy
+      as="td"
+      value={props.value}
+      label={props.label}
+      disabled={props.value === ''}
+      className={props.className}
+    >
+      {props.children}
+    </ClickToCopy>
   );
 }
 
@@ -157,8 +214,18 @@ function format(value: number | null): string {
   return value === null ? '—' : `${value.toFixed(0)} cm⁻¹`;
 }
 
+/** The number on its own, as a reader would paste it. */
+function fixed(value: number | null, digits: number): string {
+  return value === null ? '' : value.toFixed(digits);
+}
+
+/** A difference on its own, rounded the way {@link signed} rounds it. */
+function rounded(value: number | null): string {
+  return value === null ? '' : String(Math.round(value));
+}
+
 function signed(value: number | null): string {
   if (value === null) return '—';
-  const rounded = Math.round(value);
-  return `${rounded > 0 ? '+' : ''}${rounded} cm⁻¹`;
+  const whole = Math.round(value);
+  return `${whole > 0 ? '+' : ''}${whole} cm⁻¹`;
 }

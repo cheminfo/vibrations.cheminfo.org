@@ -15,6 +15,7 @@ import { QueueProgress } from './QueueProgress.tsx';
 import { ResultsSummary } from './ResultsSummary.tsx';
 import type { EntryStatus } from './entryStatus.ts';
 import { findEntryResult } from './entryStatus.ts';
+import { COLLECTION_PROBES } from './keyBand.ts';
 import type { QueueState } from './useCollectionQueue.ts';
 
 interface CollectionDetailProps {
@@ -37,6 +38,7 @@ export function CollectionDetail(props: CollectionDetailProps) {
   const { collection, queue, onRunEntry } = props;
   const results = series.results.value;
   const failures = queue.collectionId === collection.id ? queue.failures : {};
+  const probe = COLLECTION_PROBES[collection.id];
 
   return (
     <div style={detailStyle}>
@@ -53,6 +55,7 @@ export function CollectionDetail(props: CollectionDetailProps) {
               status={entryStatus(entry, queue, collection.id, stored !== null)}
               result={stored}
               failure={failures[entry.id] ?? null}
+              probe={probe}
               onRun={() => onRunEntry(entry)}
               onInspect={() => {
                 if (stored === null) return;
