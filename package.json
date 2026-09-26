@@ -1,6 +1,6 @@
 {
   "name": "vibrations.cheminfo.org",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Predict and explore infrared and Raman spectra of a molecule in the browser",
   "license": "GPL-3.0-or-later",
   "type": "module",
