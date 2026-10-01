@@ -13,6 +13,7 @@
     "dev": "vite",
     "eslint": "eslint .",
     "eslint-fix": "eslint . --fix",
+    "og-image": "node scripts/generateOgImage.ts",
     "prettier": "prettier --check .",
     "prettier-write": "prettier --write .",
     "preview": "vite preview",
@@ -31,7 +32,7 @@
     "openchemlib": "^9.25.0",
     "raman-spectrum": "^1.0.1",
     "react": "^19.2.8",
-    "react-cheminfo": "^0.35.0",
+    "react-cheminfo": "^0.36.0",
     "react-dom": "^19.2.8",
     "react-mf": "^3.1.1",
     "react-ocl": "^8.7.2",
@@ -42,6 +43,7 @@
     "xtb-wasm": "^1.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.1.1",
