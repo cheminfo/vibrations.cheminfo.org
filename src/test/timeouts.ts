@@ -6,7 +6,10 @@
  * explicit timeout.
  */
 
-/** Timeout for a test that loads openchemlib or builds a few conformers. */
+/**
+ * Timeout for a test that loads one of the heavy dependencies — openchemlib or
+ * xtb-wasm — or builds a few conformers.
+ */
 export const OCL_TIMEOUT = 60_000;
 
 /** Timeout for the test that builds all 36 collection conformers. */

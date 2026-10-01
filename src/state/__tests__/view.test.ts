@@ -1,39 +1,52 @@
 import { beforeEach, expect, test } from 'vitest';
 
-import {
-  closePanel,
-  openPanel,
-  routeFromHash,
-  togglePanel,
-  view,
-} from '../view.ts';
+import { routeFromAddress } from '../router.ts';
+import { closePanel, openPanel, togglePanel, view } from '../view.ts';
 
 beforeEach(() => {
   view.openPanels.value = new Set(['molecule']);
 });
 
-test('a bare page hash reads as that page with no parameter', () => {
-  expect(routeFromHash('#/collections')).toStrictEqual({
+test('a bare page address reads as that page with no parameter', () => {
+  expect(routeFromAddress('/collections')).toStrictEqual({
     page: 'collections',
     param: null,
   });
 });
 
 test('a second segment is the deep-link parameter, percent-decoded', () => {
-  expect(routeFromHash('#/collections/inductive%2Fmesomeric')).toStrictEqual({
+  expect(routeFromAddress('/collections/inductive%2Fmesomeric')).toStrictEqual({
     page: 'collections',
     param: 'inductive/mesomeric',
   });
 });
 
-test('an unknown or empty hash falls back to the calculator', () => {
-  expect(routeFromHash('')).toStrictEqual({ page: 'calculator', param: null });
-  expect(routeFromHash('#/nowhere')).toStrictEqual({
+test('an unknown or empty address falls back to the calculator', () => {
+  expect(routeFromAddress('')).toStrictEqual({
     page: 'calculator',
     param: null,
   });
-  expect(routeFromHash('#/validation/')).toStrictEqual({
+  expect(routeFromAddress('/nowhere')).toStrictEqual({
+    page: 'calculator',
+    param: null,
+  });
+  expect(routeFromAddress('/validation/')).toStrictEqual({
     page: 'validation',
+    param: null,
+  });
+});
+
+test('a link written while the site routed by the hash still opens', () => {
+  expect(routeFromAddress('/#/collections/ring-strain')).toStrictEqual({
+    page: 'collections',
+    param: 'ring-strain',
+  });
+  expect(routeFromAddress('#/validation')).toStrictEqual({
+    page: 'validation',
+    param: null,
+  });
+  expect(routeFromAddress('#/calculator')).toStrictEqual({
+    page: 'calculator',
     param: null,
   });
 });

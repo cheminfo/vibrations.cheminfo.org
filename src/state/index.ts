@@ -75,16 +75,17 @@ export {
   settingsForMolecule,
   settingsSignals,
 } from './settings.ts';
-export type { PageId, PanelId, Route } from './view.ts';
+export type { PageId, Route } from './router.ts';
+export { PAGES, addressOf, routeFromAddress, router } from './router.ts';
+export type { PanelId } from './view.ts';
 export {
-  PAGES,
   PANEL_IDS,
-  applyHash,
+  applyRoute,
   clearSelection,
   closePanel,
   closeTour,
+  currentAddress,
   openPanel,
-  routeFromHash,
   selectMode,
   setPage,
   setTourStep,

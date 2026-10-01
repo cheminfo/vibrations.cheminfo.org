@@ -1,8 +1,7 @@
-import { Classes, Dialog, DialogBody, Tab, Tabs } from '@blueprintjs/core';
+import { Classes, Tab, Tabs } from '@blueprintjs/core';
 
-import { THEORY_SECTIONS } from '../data/index.ts';
-
-import { AppLogo } from './AppLogo.tsx';
+import { THEORY_SECTIONS } from '../../data/index.ts';
+import { AppLogo } from '../../shared/AppLogo.tsx';
 
 /** One borrowed work, with what it does here and the terms it comes under. */
 interface Credit {
@@ -76,40 +75,38 @@ const CREDITS: readonly Credit[] = [
   },
 ];
 
-interface AboutDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 /**
- * What the application is, what it borrows, and the background reading. It is
- * the first item of the toolbar because the credits are a condition of use, not
- * an afterthought.
- * @param props - Component props.
- * @param props.isOpen - Whether the dialog is visible.
- * @param props.onClose - Called when the user dismisses it.
+ * What the application is, what it borrows, and the background reading.
+ *
+ * It is a routed page at `/about` rather than a dialog: a page is indexed, so
+ * somebody searching for the tool finds it; it is linkable, so a course can
+ * point at it; and it prints, which a dialog does not.
+ * @returns The page.
  */
-export function AboutDialog(props: AboutDialogProps) {
-  const { isOpen, onClose } = props;
+export function AboutView() {
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      title="About Vibrations"
-      icon={<AppLogo size={20} />}
-      style={{ width: 720 }}
-    >
-      {/* Prose, credits and literature references: a reader quotes them. */}
-      <DialogBody className="text-selectable">
+    // Prose, credits and literature references: a reader quotes them.
+    <div className="text-selectable" style={pageStyle}>
+      <div style={bodyStyle}>
         <Tabs id="about" defaultSelectedTabId="about" renderActiveTabPanelOnly>
           <Tab id="about" title="About" panel={<AboutPanel />} />
           <Tab id="credits" title="Credits" panel={<CreditsPanel />} />
           <Tab id="background" title="Background" panel={<BackgroundPanel />} />
         </Tabs>
-      </DialogBody>
-    </Dialog>
+      </div>
+    </div>
   );
 }
+
+const pageStyle = {
+  flex: '1 1 1px',
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'auto',
+  padding: '16px 20px 32px',
+} as const;
+
+const bodyStyle = { maxWidth: 820, margin: '0 auto' } as const;
 
 function AboutPanel() {
   return (
@@ -129,10 +126,6 @@ function AboutPanel() {
           wrong. Every geometry, frequency and intensity describes one isolated
           molecule in the gas phase, so a band measured in solution or in the
           solid state can sit tens of cm⁻¹ away.
-        </p>
-        <p className={Classes.TEXT_MUTED} style={{ marginBottom: 0 }}>
-          The browser engine is GPL-3.0 (OCC), and this application is
-          distributed under the same terms.
         </p>
       </div>
     </div>
@@ -162,7 +155,7 @@ function CreditsPanel() {
 
 function BackgroundPanel() {
   return (
-    <div style={{ maxHeight: '50vh', overflow: 'auto' }}>
+    <div>
       {THEORY_SECTIONS.map((section) => (
         <section key={section.id}>
           <h4 style={{ marginBottom: 4 }}>{section.title}</h4>

@@ -10,6 +10,21 @@ packages an independent C++ implementation of GFN2-xTB
 ([OCC](https://github.com/peterspackman/occ)) as WebAssembly and drives it from
 a pool of web workers.
 
+## The addresses it answers
+
+The route lives in the path, through the History API, and the build writes one
+real HTML file per address with its own title, description and canonical — so
+each page is its own search result. A link written while the site routed by the
+hash (`#/collections/ring-strain`) still opens, and is rewritten in the bar.
+
+| Address             | What it opens                                |
+| ------------------- | -------------------------------------------- |
+| `/`                 | the calculator                               |
+| `/collections`      | the curated collections                      |
+| `/collections/<id>` | one of them, e.g. `/collections/ring-strain` |
+| `/validation`       | the reference calculations                   |
+| `/about`            | what it computes, and what it borrows        |
+
 ## The three pages
 
 - **Calculator** — draw, paste or load a structure, run it, and read the
@@ -37,7 +52,12 @@ file do not agree with.
 
 `npm run test` runs the unit tests with coverage, the type check, the colour
 token and deployment contract checks, ESLint and Prettier. `npm run build`
-writes the static site to `dist/`.
+writes the static site to `dist/` — one HTML file per address, plus
+`sitemap.xml` and `robots.txt`.
+
+`npm run og-image` redraws `public/og.png`, the 1200×630 card a link to the
+site unfurls into. It is drawn from the site's own record and glyph, so run it
+whenever the mark or the two colours change.
 
 ## Deployment
 

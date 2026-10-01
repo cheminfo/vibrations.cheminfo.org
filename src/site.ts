@@ -15,3 +15,10 @@ export const SITE: SiteRecord = {
   brandAlt: '#a16207',
   mark: { plate: '#0072b2', accent: '#e69f00' },
 };
+
+/**
+ * Where the site is published: what every canonical link, social card and
+ * sitemap entry is written from, so a mirror of this build still points a
+ * crawler back here instead of competing with it for one search result.
+ */
+export const SITE_URL = `https://${SITE.host}`;

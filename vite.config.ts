@@ -1,5 +1,9 @@
 import react from '@vitejs/plugin-react';
+import { cheminfoPrerender } from 'react-cheminfo/vite';
 import { defineConfig } from 'vite';
+
+import { NOSCRIPT_ROUTES, PAGE_ROUTES } from './src/seo/routes.ts';
+import { SITE, SITE_URL } from './src/site.ts';
 
 /**
  * Derived from the site's creation date, 2026-09-18: last digit of the year,
@@ -10,7 +14,31 @@ import { defineConfig } from 'vite';
 const DEV_PORT = 10_919;
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // One real HTML file per address, plus the sitemap, robots.txt and the
+    // structured data. A static image has nothing to rewrite a head per
+    // request, so without this every address carries the same title and a
+    // search engine folds the whole site into one result.
+    cheminfoPrerender({
+      // The site writes its own record: it is deliberately not one of the
+      // cheminfo family, so there is no id to name here.
+      site: SITE,
+      routes: PAGE_ROUTES,
+      origin: SITE_URL,
+      description:
+        'Draw a molecule and compute its infrared and Raman spectrum with GFN2-xTB in your own browser: frequencies, intensities, normal modes in 3D and the thermochemistry.',
+      noscript: {
+        heading:
+          'vibrations.cheminfo.org — IR and Raman spectra in your browser',
+        intro:
+          'Draw or paste a structure and a GFN2-xTB geometry optimization, Hessian, normal modes, intensities and thermochemistry run on your own machine; nothing is uploaded. The tool needs JavaScript; these are the pages it offers:',
+        // No ecosystem list: no other site of the family links here, and this
+        // one links to none of them.
+        routes: NOSCRIPT_ROUTES,
+      },
+    }),
+  ],
   resolve: {
     // A linked xtb-wasm carries its own node_modules; two openchemlib copies
     // mean two Molecule classes, and the atom indices the bond-to-mode

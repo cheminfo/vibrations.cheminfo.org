@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 
 import type { CollectionEntry } from '../../../data/index.ts';
 import type { ResultEntry } from '../../../state/index.ts';
+import { OCL_TIMEOUT } from '../../../test/timeouts.ts';
 import { makeEntry, makeMode } from '../../calculator/__tests__/makeEntry.ts';
 import { EntryCard } from '../EntryCard.tsx';
 import type { BandProbe } from '../keyBand.ts';
@@ -56,17 +57,23 @@ test('the structure, the name and the formula of an entry are copyable', () => {
   expect(html).toContain('title="Copy the molecular formula (C3H6O)"');
 });
 
-test('a computed band is copied without its unit, named after the probe', () => {
-  const html = markup(
-    ENTRY,
-    makeEntry('propanone', [makeMode(1786.4, 312.57, null)]),
-    CARBONYL_PROBE,
-  );
-  expect(html).toContain('1786 cm⁻¹');
-  expect(html).toContain(
-    'title="Copy the C=O stretch wavenumber in cm⁻¹ (1786)"',
-  );
-});
+test(
+  'a computed band is copied without its unit, named after the probe',
+  () => {
+    const html = markup(
+      ENTRY,
+      makeEntry('propanone', [makeMode(1786.4, 312.57, null)]),
+      CARBONYL_PROBE,
+    );
+    expect(html).toContain('1786 cm⁻¹');
+    expect(html).toContain(
+      'title="Copy the C=O stretch wavenumber in cm⁻¹ (1786)"',
+    );
+    // The first test to build a result, so it is the one that pays for loading
+    // xtb-wasm under v8 coverage.
+  },
+  OCL_TIMEOUT,
+);
 
 test('a collection with no probe band names no band on its cards', () => {
   const html = markup(

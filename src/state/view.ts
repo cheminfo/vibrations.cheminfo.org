@@ -1,10 +1,10 @@
 import { signal } from '@preact/signals-react';
+import { writeRoute } from 'react-cheminfo/core';
 
 import { TOUR_STEPS } from '../data/index.ts';
 
-/** The pages the left toolbar switches between, in toolbar order. */
-export const PAGES = ['calculator', 'collections', 'validation'] as const;
-export type PageId = (typeof PAGES)[number];
+import type { PageId, Route } from './router.ts';
+import { addressOf, router } from './router.ts';
 
 /** The side panels, in the order the activity bar lists them. */
 export const PANEL_IDS = [
@@ -17,15 +17,8 @@ export const PANEL_IDS = [
 ] as const;
 export type PanelId = (typeof PANEL_IDS)[number];
 
-/** A page and the one thing it can deep-link to, e.g. a collection or a fixture. */
-export interface Route {
-  page: PageId;
-  /** The second hash segment, decoded, or `null` when there is none. */
-  param: string | null;
-}
-
 export const view = {
-  /** Active page, mirrored into `window.location.hash`. */
+  /** Active page, mirrored into the address bar. */
   page: signal<PageId>('calculator'),
   /** The page's deep-link parameter, e.g. the open collection's id. */
   param: signal<string | null>(null),
@@ -33,7 +26,6 @@ export const view = {
   openPanels: signal<ReadonlySet<PanelId>>(
     new Set<PanelId>(['molecule', 'series', 'modes']),
   ),
-  aboutOpen: signal(false),
   tourOpen: signal(false),
   /** Index into `TOUR_STEPS`. */
   tourStep: signal(0),
@@ -55,7 +47,11 @@ export const view = {
 };
 
 /**
- * Switch page and record it in the URL hash so a reload comes back here.
+ * Switch page and record it in the address bar, so a reload — and a link handed
+ * out — comes back here.
+ *
+ * Changing page pushes a history entry and moving inside one replaces it, so
+ * back walks the pages rather than every collection a visitor clicked through.
  * @param page - The page to activate.
  * @param param - Deep-link parameter, e.g. a collection id.
  * @default param null
@@ -63,35 +59,21 @@ export const view = {
 export function setPage(page: PageId, param: string | null = null): void {
   view.page.value = page;
   view.param.value = param;
-  const hash =
-    param === null ? `#/${page}` : `#/${page}/${encodeURIComponent(param)}`;
-  if (globalThis.location.hash !== hash) globalThis.location.hash = hash;
+  writeRoute(router, { tab: page, id: param });
 }
 
 /**
- * Read the route out of a hash, falling back to the calculator.
- * @param hash - The hash to parse, including its leading `#`.
- * @returns The page and its parameter.
+ * Copy a route into the view signals, without writing it back.
+ * @param route - The page the address names, and its parameter.
  */
-export function routeFromHash(hash: string): Route {
-  const [rawPage = '', rawParam] = hash.replace(/^#\/?/, '').split('/');
-  const page = (PAGES as readonly string[]).includes(rawPage)
-    ? (rawPage as PageId)
-    : 'calculator';
-  return {
-    page,
-    param:
-      rawParam === undefined || rawParam === ''
-        ? null
-        : decodeURIComponent(rawParam),
-  };
-}
-
-/** Copy the current URL hash into the view signals, without writing it back. */
-export function applyHash(): void {
-  const route = routeFromHash(globalThis.location.hash);
+export function applyRoute(route: Route): void {
   view.page.value = route.page;
   view.param.value = route.param;
+}
+
+/** The address of the page on screen, for the tab title and the canonical. */
+export function currentAddress(): string {
+  return addressOf({ page: view.page.value, param: view.param.value });
 }
 
 /**

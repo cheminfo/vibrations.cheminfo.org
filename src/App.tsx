@@ -1,8 +1,14 @@
 import { NonIdealState } from '@blueprintjs/core';
 import type { IconName } from '@blueprintjs/icons';
+import { effect } from '@preact/signals-react';
 import { useSignals } from '@preact/signals-react/runtime';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import {
+  readRoute,
+  startDocumentMeta,
+  subscribeToRoute,
+} from 'react-cheminfo/core';
 import type { NavItem } from 'react-cheminfo/ui';
 import { NavLink, SiteHeader, SiteTheme } from 'react-cheminfo/ui';
 import {
@@ -13,17 +19,26 @@ import {
   SplitPane,
 } from 'react-science/ui';
 
+import { AboutView } from './pages/about/AboutView.tsx';
 import { CalculatorPage } from './pages/calculator/CalculatorPage.tsx';
 import { CollectionsPage } from './pages/collections/CollectionsPage.tsx';
 import { ValidationPage } from './pages/validation/ValidationPage.tsx';
-import { AboutDialog } from './shared/AboutDialog.tsx';
+import { PAGE_ROUTES } from './seo/routes.ts';
 import { AppLogo } from './shared/AppLogo.tsx';
 import { PanelStack } from './shared/PanelStack.tsx';
 import { StatusBar } from './shared/StatusBar.tsx';
 import { panelsForPage } from './shared/panels.ts';
-import { SITE } from './site.ts';
+import { SITE, SITE_URL } from './site.ts';
 import type { PageId } from './state/index.ts';
-import { applyHash, setPage, state, togglePanel } from './state/index.ts';
+import {
+  addressOf,
+  applyRoute,
+  currentAddress,
+  router,
+  setPage,
+  state,
+  togglePanel,
+} from './state/index.ts';
 
 interface PageItem {
   id: PageId;
@@ -48,6 +63,7 @@ const PAGE_VIEWS: Partial<Record<PageId, () => ReactNode>> = {
   calculator: () => <CalculatorPage />,
   collections: () => <CollectionsPage />,
   validation: () => <ValidationPage />,
+  about: () => <AboutView />,
 };
 
 /**
@@ -62,16 +78,12 @@ export function App() {
   const panels = panelsForPage(page);
   const openHere = panels.filter((panel) => openPanels.has(panel.id));
 
-  useEffect(() => {
-    applyHash();
-    globalThis.addEventListener('hashchange', applyHash);
-    return () => globalThis.removeEventListener('hashchange', applyHash);
-  }, []);
+  useRouteSync();
 
   const nav: NavItem[] = PAGE_ITEMS.map((item) => ({
     id: item.id,
     label: item.title,
-    href: `#/${item.id}`,
+    href: addressOf({ page: item.id, param: null }),
     onSelect: () => setPage(item.id),
   }));
 
@@ -84,16 +96,18 @@ export function App() {
         width="full"
         nav={nav}
         activeId={page}
-        homeHref="#/calculator"
+        homeHref="/"
         onHome={() => setPage('calculator')}
         actions={
           <NavLink
+            active={page === 'about'}
             item={{
               id: 'about',
               label: 'About',
               icon: <AppLogo size={14} />,
+              href: addressOf({ page: 'about', param: null }),
               title: `What ${SITE.host} is, and what it is built on`,
-              onSelect: () => (state.view.aboutOpen.value = true),
+              onSelect: () => setPage('about'),
             }}
           />
         }
@@ -144,15 +158,41 @@ export function App() {
               ))}
             </ActivityBar>
           </div>
-
-          <AboutDialog
-            isOpen={state.view.aboutOpen.value}
-            onClose={() => (state.view.aboutOpen.value = false)}
-          />
         </RootLayout>
       </main>
     </div>
   );
+}
+
+/**
+ * Two-way binding between the address and the page on show, plus the tab title.
+ *
+ * The signal `effect` is created *after* the initial address has been applied,
+ * so it runs with the state that address just set and can never overwrite a
+ * deep link with the defaults it captured a render earlier.
+ */
+function useRouteSync(): void {
+  useEffect(() => {
+    function follow(): void {
+      const route = readRoute(router);
+      applyRoute({ page: route.tab, param: route.id });
+    }
+    follow();
+    const stopFollowing = subscribeToRoute(router, follow);
+    const stopTitling = startDocumentMeta({
+      site: SITE,
+      routes: PAGE_ROUTES,
+      url: currentAddress,
+      // The published address, so a mirror of this build still points a crawler
+      // back here rather than competing with it for one search result.
+      origin: SITE_URL,
+      follow: effect,
+    });
+    return () => {
+      stopFollowing();
+      stopTitling();
+    };
+  }, []);
 }
 
 function PageView(props: { page: PageId }) {

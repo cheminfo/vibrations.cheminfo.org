@@ -35,9 +35,14 @@ test('the site writes no selection policy of its own', () => {
   expect(offenders).toStrictEqual([]);
 });
 
-test('the About dialog stays selectable, because a reader quotes it', () => {
-  const dialog = readFileSync(join(SRC, 'shared', 'AboutDialog.tsx'), 'utf8');
-  expect(dialog).toContain('<DialogBody className="text-selectable">');
+test('the About page stays selectable, because a reader quotes it', () => {
+  const about = readFileSync(
+    join(SRC, 'pages', 'about', 'AboutView.tsx'),
+    'utf8',
+  );
+  expect(about).toContain(
+    '<div className="text-selectable" style={pageStyle}>',
+  );
 });
 
 /** Every source file of the site, its own tests left out. */

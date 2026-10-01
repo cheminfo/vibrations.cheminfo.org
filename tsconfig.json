@@ -4,5 +4,5 @@
     "noEmit": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src", "vite*.ts", "vitest.config.ts"]
+  "include": ["src", "scripts", "vite*.ts", "vitest.config.ts"]
 }
