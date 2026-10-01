@@ -44,22 +44,21 @@ export function DisplaySection() {
         label="Band width (FWHM) / cm⁻¹"
         value={display.fwhm.value}
         min={0.5}
-        stepSize={5}
-        minorStepSize={0.5}
+        step={5}
         onChange={(value) => (display.fwhm.value = value)}
       />
       <NumberField
         label="From / cm⁻¹"
         value={display.from.value}
         min={0}
-        stepSize={100}
+        step={100}
         onChange={(value) => (display.from.value = value)}
       />
       <NumberField
         label="To / cm⁻¹"
         value={display.to.value}
         min={0}
-        stepSize={100}
+        step={100}
         onChange={(value) => (display.to.value = value)}
       />
       <NumberField
@@ -67,8 +66,7 @@ export function DisplaySection() {
         value={display.wavenumberScale.value}
         min={0.5}
         max={1.5}
-        stepSize={0.01}
-        minorStepSize={0.001}
+        step={0.01}
         helperText="Harmonic frequencies come out systematically high; scaling is the conventional fix, so it is applied only when asked for."
         onChange={(value) => (display.wavenumberScale.value = value)}
       />
@@ -101,14 +99,14 @@ export function DisplaySection() {
             label="Window from / cm⁻¹"
             value={normalization.from.value}
             min={0}
-            stepSize={100}
+            step={100}
             onChange={(value) => (normalization.from.value = value)}
           />
           <NumberField
             label="Window to / cm⁻¹"
             value={normalization.to.value}
             min={0}
-            stepSize={100}
+            step={100}
             onChange={(value) => (normalization.to.value = value)}
           />
         </>

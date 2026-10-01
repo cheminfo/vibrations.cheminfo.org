@@ -25,22 +25,21 @@ export function ConditionsSection() {
         label="Temperature / K"
         value={settings.temperature.value}
         min={0}
-        stepSize={10}
-        minorStepSize={0.01}
+        step={10}
         onChange={(value) => (settings.temperature.value = value)}
       />
       <NumberField
         label="Pressure / Pa"
         value={settings.pressure.value}
         min={0}
-        stepSize={1000}
+        step={1000}
         onChange={(value) => (settings.pressure.value = value)}
       />
       <NumberField
         label="Symmetry number σ"
         value={symmetry ?? 1}
         min={1}
-        stepSize={1}
+        step={1}
         onChange={(value) =>
           (settings.symmetryNumber.value = Math.round(value))
         }

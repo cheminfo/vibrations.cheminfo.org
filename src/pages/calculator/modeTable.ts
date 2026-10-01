@@ -1,11 +1,9 @@
-import { toDelimited } from 'react-cheminfo/core';
-
 import type { ModeColumn } from './modeColumns.ts';
 import { MISSING_VALUE } from './modeColumns.ts';
 import type { ModeRow } from './modeRows.ts';
 
 /**
- * The mode table as tab-separated text, ready for a spreadsheet.
+ * The mode table as cells, ready to be handed over.
  *
  * Every row of the table is a button that selects and animates its mode, so a
  * single number cannot be clicked to copy it; the whole table is taken at once
@@ -15,12 +13,12 @@ import type { ModeRow } from './modeRows.ts';
  * number for is written empty rather than as the dash the table draws.
  * @param rows - The rows, in display order.
  * @param columns - The columns of the current layout, left to right.
- * @returns The text, its heading line first.
+ * @returns The heading and one line of cells per mode.
  */
-export function modeTableText(
+export function modeTable(
   rows: readonly ModeRow[],
   columns: readonly ModeColumn[],
-): string {
+): { header: string[]; rows: string[][] } {
   const header = new Array<string>(columns.length + 1);
   header[0] = 'mode';
   for (let column = 0; column < columns.length; column++) {
@@ -39,5 +37,5 @@ export function modeTableText(
     lines[line] = cells;
   }
 
-  return toDelimited(lines, { header });
+  return { header, rows: lines };
 }

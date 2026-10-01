@@ -27,7 +27,7 @@ export function StructureSection() {
       <NumberField
         label="Charge"
         value={chargeOverride ?? molecule?.charge ?? 0}
-        stepSize={1}
+        step={1}
         onChange={(value) => (settings.chargeOverride.value = value)}
         helperText={
           chargeOverride === null ? (
@@ -52,7 +52,7 @@ export function StructureSection() {
         label="Unpaired electrons"
         value={spinOverride ?? molecule?.unpairedElectrons ?? 0}
         min={0}
-        stepSize={1}
+        step={1}
         onChange={(value) => (settings.unpairedElectronsOverride.value = value)}
         helperText={
           spinOverride === null ? (
@@ -92,7 +92,7 @@ export function StructureSection() {
         label="Maximum optimizer cycles"
         value={settings.maxCycles.value}
         min={1}
-        stepSize={10}
+        step={10}
         disabled={!optimize}
         onChange={(value) => (settings.maxCycles.value = Math.round(value))}
       />

@@ -1,9 +1,8 @@
 import { useSignals } from '@preact/signals-react/runtime';
 import { useMemo, useState } from 'react';
-import { useCopyToClipboard } from 'react-cheminfo/ui';
+import { TableDataButton } from 'react-cheminfo/ui';
 import { Toolbar } from 'react-science/ui';
 
-import { copyIcon, copyTooltip } from '../../shared/copyFeedback.ts';
 import {
   panelBodyStyle,
   panelStyle,
@@ -22,7 +21,7 @@ import { ModeTable } from './ModeTable.tsx';
 import { modeColumns } from './modeColumns.ts';
 import type { ModeSortKey } from './modeRows.ts';
 import { sortedModeRows } from './modeRows.ts';
-import { modeTableText } from './modeTableText.ts';
+import { modeTable } from './modeTable.ts';
 
 /**
  * The normal-mode table of the active result.
@@ -37,10 +36,10 @@ export function ModesPanel() {
   const selection = preferences.display.charts.value;
   const selected = view.selectedMode.value;
   const animating = view.animating.value;
-  const table = useCopyToClipboard();
   const [sort, setSort] = useState<Sort>(DEFAULT_SORT);
 
   const columns = useMemo(() => modeColumns(selection), [selection]);
+  const headings = useMemo(() => modeTable([], columns).header, [columns]);
   const rows = useMemo(
     () =>
       sortedModeRows(modes, {
@@ -76,15 +75,22 @@ export function ModesPanel() {
               }))
             }
           />
-          <Toolbar.Item
-            icon={copyIcon(table)}
-            tooltip={copyTooltip(
-              table,
-              'Copy the mode table as tab-separated text',
-            )}
-            aria-label="Copy the mode table"
+          <TableDataButton
+            rows={() => modeTable(rows, columns).rows}
+            header={headings}
+            fileName="normal-modes"
+            title="The normal-mode table"
+            description="One line per mode, in the order the table reads, each column headed with its unit. A cell the engine produced no number for is written empty."
             disabled={rows.length === 0}
-            onClick={() => void table.copy(modeTableText(rows, columns))}
+            trigger={(open) => (
+              <Toolbar.Item
+                icon="th"
+                tooltip="Copy or download the mode table"
+                aria-label="Copy or download the mode table"
+                disabled={rows.length === 0}
+                onClick={open}
+              />
+            )}
           />
           <Toolbar.Item
             icon="cross"

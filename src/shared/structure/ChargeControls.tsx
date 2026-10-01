@@ -1,6 +1,7 @@
-import { Button, FormGroup, NumericInput, Tag } from '@blueprintjs/core';
+import { Button, FormGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import type { CSSProperties, ReactElement } from 'react';
+import { NumberInput } from 'react-cheminfo/ui';
 import type { Molecule } from 'xtb-wasm';
 
 import { preferences, resetStructureOverrides } from '../../state/index.ts';
@@ -37,26 +38,28 @@ export function ChargeControls(props: ChargeControlsProps): ReactElement {
   return (
     <div style={rootStyle}>
       <FormGroup label="Charge" style={fieldStyle}>
-        <NumericInput
+        <NumberInput
           fill
+          integer
           min={CHARGE_LIMIT * -1}
           max={CHARGE_LIMIT}
           value={chargeOverride ?? molecule.charge}
-          onValueChange={(value: number) => {
-            settings.chargeOverride.value = Number.isFinite(value) ? value : 0;
+          ariaLabel="Charge"
+          onChange={(value) => {
+            settings.chargeOverride.value = value;
           }}
         />
       </FormGroup>
       <FormGroup label="Unpaired electrons" style={fieldStyle}>
-        <NumericInput
+        <NumberInput
           fill
+          integer
           min={0}
           max={SPIN_LIMIT}
           value={spinOverride ?? molecule.unpairedElectrons}
-          onValueChange={(value: number) => {
-            settings.unpairedElectronsOverride.value = Number.isFinite(value)
-              ? Math.max(0, value)
-              : 0;
+          ariaLabel="Unpaired electrons"
+          onChange={(value) => {
+            settings.unpairedElectronsOverride.value = value;
           }}
         />
       </FormGroup>

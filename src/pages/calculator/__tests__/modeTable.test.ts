@@ -1,8 +1,9 @@
+import { toDelimited } from 'react-cheminfo/core';
 import { expect, test } from 'vitest';
 
 import { modeColumns } from '../modeColumns.ts';
 import { sortedModeRows } from '../modeRows.ts';
-import { modeTableText } from '../modeTableText.ts';
+import { modeTable } from '../modeTable.ts';
 
 import { makeMode } from './makeEntry.ts';
 
@@ -29,7 +30,8 @@ test('the stacked layout writes every column with its unit', () => {
     key: 'wavenumber',
     chart: 'infrared',
   });
-  const text = modeTableText(rows, modeColumns('both'));
+  const table = modeTable(rows, modeColumns('both'));
+  const text = toDelimited(table.rows, { header: table.header });
 
   expect(text).toBe(
     [
@@ -47,7 +49,8 @@ test('the infrared layout drops the Raman columns and keeps the display order', 
     chart: 'infrared',
     descending: true,
   });
-  const text = modeTableText(rows, modeColumns('infrared'));
+  const infrared = modeTable(rows, modeColumns('infrared'));
+  const text = toDelimited(infrared.rows, { header: infrared.header });
 
   expect(text).toBe(
     [

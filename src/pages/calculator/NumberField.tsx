@@ -1,5 +1,6 @@
-import { FormGroup, NumericInput } from '@blueprintjs/core';
+import { FormGroup } from '@blueprintjs/core';
 import type { ReactNode } from 'react';
+import { NumberInput } from 'react-cheminfo/ui';
 
 export interface NumberFieldProps {
   label: string;
@@ -9,10 +10,8 @@ export interface NumberFieldProps {
   min?: number;
   /** @default undefined */
   max?: number;
-  /** @default 1 */
-  stepSize?: number;
-  /** @default undefined */
-  minorStepSize?: number | null;
+  /** What one arrow press adds; Shift multiplies it by ten. @default 1 */
+  step?: number;
   /** Shown under the input. @default undefined */
   helperText?: ReactNode;
   /** @default false */
@@ -24,9 +23,9 @@ export interface NumberFieldProps {
 /**
  * One labelled numeric setting.
  *
- * A non-finite entry — an emptied box, a half-typed minus sign — is ignored
- * rather than written, so a setting is never left as `NaN` and silently carried
- * into a calculation.
+ * A half-typed entry — a lone minus sign, a trailing decimal point — is kept in
+ * the box and not written, so a setting is never left as `NaN` and silently
+ * carried into a calculation.
  * @param props - See {@link NumberFieldProps}.
  * @returns The field.
  */
@@ -37,8 +36,7 @@ export function NumberField(props: NumberFieldProps) {
     onChange,
     min,
     max,
-    stepSize = 1,
-    minorStepSize,
+    step = 1,
     helperText,
     disabled = false,
     action,
@@ -47,21 +45,16 @@ export function NumberField(props: NumberFieldProps) {
   return (
     <FormGroup label={label} helperText={helperText} style={groupStyle}>
       <div style={rowStyle}>
-        <NumericInput
+        <NumberInput
           value={value}
           min={min}
           max={max}
-          stepSize={stepSize}
-          // BlueprintJS requires minor ≤ step ≤ major and defaults major to 10,
-          // which a field stepping in hundreds would violate.
-          majorStepSize={stepSize * 10}
-          minorStepSize={minorStepSize}
+          step={step}
           disabled={disabled}
           fill
           size="small"
-          onValueChange={(next) => {
-            if (Number.isFinite(next)) onChange(next);
-          }}
+          ariaLabel={label}
+          onChange={onChange}
         />
         {action}
       </div>
