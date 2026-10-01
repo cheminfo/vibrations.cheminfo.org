@@ -10,7 +10,6 @@ export const SITE: SiteRecord = {
   id: 'vibrations',
   name: { lead: 'vibrations', alt: 'cheminfo', dot: true },
   host: 'vibrations.cheminfo.org',
-  repository: 'https://github.com/cheminfo/vibrations.cheminfo.org',
   tagline: 'IR and Raman spectra computed in the browser.',
   brand: '#0072b2',
   brandAlt: '#a16207',

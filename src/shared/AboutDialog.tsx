@@ -1,12 +1,4 @@
-import {
-  AnchorButton,
-  Classes,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  Tab,
-  Tabs,
-} from '@blueprintjs/core';
+import { Classes, Dialog, DialogBody, Tab, Tabs } from '@blueprintjs/core';
 
 import { THEORY_SECTIONS } from '../data/index.ts';
 
@@ -115,17 +107,6 @@ export function AboutDialog(props: AboutDialogProps) {
           <Tab id="background" title="Background" panel={<BackgroundPanel />} />
         </Tabs>
       </DialogBody>
-      <DialogFooter
-        actions={
-          <AnchorButton
-            href="https://github.com/cheminfo/vibrations.cheminfo.org"
-            target="_blank"
-            rel="noreferrer"
-            text="Source on GitHub"
-            icon="git-repo"
-          />
-        }
-      />
     </Dialog>
   );
 }
